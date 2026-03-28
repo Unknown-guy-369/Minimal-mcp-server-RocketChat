@@ -83,16 +83,16 @@ The **Minimal MCP Generator** solves all three problems through a **Two-Tool Arc
 
 ```mermaid
 graph TD
-    A[manifest.json<br/>Domain Registry] -->|Domain lookup| B[Parser<br/>src/parser.ts]
-    C[Rocket.Chat OpenAPI YAMLs<br/>GitHub Raw] -->|HTTP fetch| B
-    B -->|TOON summaries| D[Tool 1: explore_rc_api<br/>src/index.ts]
-    B -->|Endpoint[] objects| E[Endpoint Cache<br/>In-Memory Map]
-    E -->|Selected endpoints| F[Tool 2: scaffold_mcp_server<br/>src/index.ts]
-    F -->|Endpoints + projectName| G[Generator<br/>src/generator.ts]
-    H[Handlebars Templates<br/>templates/*.hbs] -->|Compiled| G
-    G -->|Writes files| I[Generated Project<br/>examples/rc-*-bot/]
-    G -->|npm install + tsc + vitest| J[Self-Testing Report]
-    
+    A["manifest.json - Domain Registry"] -->|Domain lookup| B["Parser - src/parser.ts"]
+    C["RC OpenAPI YAMLs - GitHub Raw"] -->|HTTP fetch| B
+    B -->|TOON summaries| D["Tool 1: explore_rc_api"]
+    B -->|Endpoint objects| E["Endpoint Cache - In-Memory Map"]
+    E -->|Selected endpoints| F["Tool 2: scaffold_mcp_server"]
+    F -->|Endpoints + projectName| G["Generator - src/generator.ts"]
+    H["Handlebars Templates"] -->|Compiled| G
+    G -->|Writes files| I["Generated Project"]
+    G -->|npm install + tsc + vitest| J["Self-Testing Report"]
+
     style A fill:#1a1a2e,stroke:#e94560,color:#fff
     style B fill:#16213e,stroke:#0f3460,color:#fff
     style D fill:#0f3460,stroke:#53354a,color:#fff
