@@ -1,0 +1,80 @@
+import { describe, it, expect, vi, beforeEach } from "vitest";
+import { tool } from "../src/tools/{{toolName}}.js";
+import { rcClient } from "../src/rc-client.js";
+
+describe("Tool: {{toolName}}", () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+  });
+
+  it("exports correct name and description", () => {
+    expect(tool.name).toBe("{{toolName}}");
+    expect(tool.description).toBe("{{toonHeader}}");
+  });
+
+  it("validates input schema with valid arguments", () => {
+    const validArgs = {
+      {{#each params}}
+      {{#if (eq type "string()")}}
+      {{name}}: "test_string",
+      {{else if (eq type "number()")}}
+      {{name}}: 123,
+      {{else if (eq type "boolean()")}}
+      {{name}}: true,
+      {{else if (eq type "array(z.any())")}}
+      {{name}}: [],
+      {{else}}
+      {{name}}: "test_val",
+      {{/if}}
+      {{/each}}
+    };
+    
+    const result = tool.inputSchema.safeParse(validArgs);
+    expect(result.success).toBe(true);
+  });
+
+  {{#if (hasRequired params)}}
+  it("fails validation when required arguments are missing", () => {
+    const result = tool.inputSchema.safeParse({});
+    expect(result.success).toBe(false);
+  });
+  {{/if}}
+
+  it("calls rcClient.request with correct method, path, and payload", async () => {
+    const mockArgs = {
+      {{#each params}}
+      {{#if (eq type "string()")}}
+      {{name}}: "test_string",
+      {{else if (eq type "number()")}}
+      {{name}}: 123,
+      {{else if (eq type "boolean()")}}
+      {{name}}: true,
+      {{else if (eq type "array(z.any())")}}
+      {{name}}: [],
+      {{else}}
+      {{name}}: "test_val",
+      {{/if}}
+      {{/each}}
+    };
+
+    await tool.handler(mockArgs);
+
+    expect(rcClient.request).toHaveBeenCalledTimes(1);
+    
+    // Validate request routing
+    let expectedPath = "{{path}}";
+    {{#each params}}
+    if (mockArgs.{{name}} !== undefined) {
+      const value = encodeURIComponent(String(mockArgs.{{name}}));
+      expectedPath = expectedPath.replace("{" + "{{name}}" + "}", value);
+      expectedPath = expectedPath.replace("{{name}}", value);
+    }
+    {{/each}}
+
+    expect(rcClient.request).toHaveBeenCalledWith(
+      "{{method}}",
+      expectedPath,
+      { body: mockArgs }
+    );
+  });
+});

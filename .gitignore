@@ -1,0 +1,32 @@
+# Dependencies
+node_modules/
+examples/*/node_modules/
+
+# Build output
+dist/
+examples/*/dist/
+
+# Environment files
+.env
+examples/*/.env
+
+# TypeScript cache
+*.tsbuildinfo
+
+# OS files
+Thumbs.db
+Desktop.ini
+.DS_Store
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Logs
+*.log
+npm-debug.log*
+
+# Lock files in generated examples (keep root lock)
+examples/*/package-lock.json

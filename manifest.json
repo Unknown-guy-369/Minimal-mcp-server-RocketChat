@@ -1,0 +1,66 @@
+{
+  "manifest_version": "1.0.0",
+  "base_url": "https://raw.githubusercontent.com/RocketChat/Rocket.Chat-Open-API/main/",
+  "domains": {
+    "auth": {
+      "file": "authentication.yaml",
+      "keywords": ["login", "logout", "token", "session", "2fa"],
+      "toon": "auth.ops(in,out,tk)"
+    },
+    "content": {
+      "file": "content-management.yaml",
+      "keywords": ["file", "upload", "media", "download", "folder", "assets"],
+      "toon": "cnt.ops(up,dn,get)"
+    },
+    "integrations": {
+      "file": "integrations.yaml",
+      "keywords": ["webhook", "script", "outgoing", "incoming", "integration"],
+      "toon": "int.ops(whk,scr,get)"
+    },
+    "marketplace": {
+      "file": "marketplace-apps.yaml",
+      "keywords": ["app", "install", "marketplace", "uninstall", "bundle"],
+      "toon": "mkt.ops(ins,un,get)"
+    },
+    "msg": {
+      "file": "messaging.yaml",
+      "keywords": ["message", "chat", "post", "react", "delete", "history", "star", "pin"],
+      "toon": "msg.ops(send,del,re,hist)"
+    },
+    "misc": {
+      "file": "miscellaneous.yaml",
+      "keywords": ["info", "version", "health", "shield", "spotlight"],
+      "toon": "msc.ops(ver,hlt,inf)"
+    },
+    "notify": {
+      "file": "notifications.yaml",
+      "keywords": ["push", "email", "alert", "unread", "mention", "counter"],
+      "toon": "ntfy.ops(psh,eml,rd)"
+    },
+    "omni": {
+      "file": "omnichannel.yaml",
+      "keywords": ["livechat", "agent", "visitor", "queue", "department", "inquiry"],
+      "toon": "omni.ops(chat,agt,q)"
+    },
+    "rooms": {
+      "file": "rooms.yaml",
+      "keywords": ["channel", "room", "group", "invite", "announcement", "join", "leave"],
+      "toon": "rm.ops(crt,ann,inv,j)"
+    },
+    "settings": {
+      "file": "settings.yaml",
+      "keywords": ["config", "setup", "permission", "oauth", "ldap", "translation"],
+      "toon": "cfg.ops(set,get,perm)"
+    },
+    "stats": {
+      "file": "statistics.yaml",
+      "keywords": ["stat", "metric", "report", "usage", "instance"],
+      "toon": "stt.ops(met,rep,usr)"
+    },
+    "users": {
+      "file": "user-management.yaml",
+      "keywords": ["user", "status", "presence", "avatar", "profile", "register"],
+      "toon": "usr.ops(info,st,av,reg)"
+    }
+  }
+}
