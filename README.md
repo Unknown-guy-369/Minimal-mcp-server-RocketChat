@@ -120,7 +120,7 @@ The architecture enforces a strict **explore → then scaffold** workflow to pre
 ### Tool 1: `explore_rc_api`
 
 ```
-Input:  { requirement: "I need to delete messages and manage rooms" }
+Input:  { requirement: "External Vendor Provisioning: Create Guest Account, Restrict to Channel, Notify Sponsor" }
 Output: TOON-compressed endpoint summaries + agent instructions
 ```
 
@@ -134,7 +134,7 @@ Output: TOON-compressed endpoint summaries + agent instructions
 ### Tool 2: `scaffold_mcp_server`
 
 ```
-Input:  { projectName: "rc-cleanup-bot", selectedToolNames: ["post_api_v1_chat_delete", ...] }
+Input:  { projectName: "rc-vendor-provisioning-mcp", selectedToolNames: ["post_api_v1_users_create", ...] }
 Output: Full TypeScript project + Self-Testing Guarantee Report
 ```
 
@@ -301,23 +301,26 @@ Once installed, Gemini CLI will expose `explore_rc_api` and `scaffold_mcp_server
 ## 🎬 Usage Example
 
 ### Prompt
-> *"Create a server to manage channel cleanup — deleting old messages, kicking inactive users, and removing stale channels."*
+> *"External Vendor Provisioning: Create Guest Account → Restrict to Single Vendor Channel → Set Account Expiration → DM Internal Sponsor"*
 
 ### Step 1: Discovery (explore_rc_api)
 
-The agent calls `explore_rc_api` with the user's requirement. The tool matches against the `msg`, `rooms`, and `integrations` domains, returning:
+The agent calls `explore_rc_api` with the user's requirement. The tool matches against the `users`, `rooms`, and `msg` domains, returning:
 
 ```
-Found domains: [msg, rooms, integrations]
+Found domains: [rooms, msg, users]
 
---- MSG (Savings: 78.3%) ---
-- post_api_v1_chat_delete: chat.del(rid:s, mid:s, [u:b])
-- post_api_v1_chat_sendMessage: chat.send(rid:s, m:s, [alias:s])
+--- USERS (Savings: 85.0%) ---
+- post_api_v1_users_create: users.new(name:o, email:o, password:o, u:o, [roles:a], [customFields:o], ...)
+- post_api_v1_users_update: users.upd(uid:o, data:o)
 
---- ROOMS (Savings: 72.1%) ---
-- post_api_v1_channels_delete: channels.del(rid:s)
-- post_api_v1_channels_kick: channels.kick(rid:s, uid:s)
-- get_api_v1_rooms_cleanHistory: rooms.cleanHistory(...)
+--- ROOMS (Savings: 85.7%) ---
+- post_api_v1_channels_invite: channels.invite(rid:o, uid:o)
+- post_api_v1_groups_invite: groups.invite(rid:o, uid:o)
+
+--- MSG (Savings: 86.4%) ---
+- post_api_v1_im_create: dm.new(u:o)
+- post_api_v1_chat_postMessage: chat.post(rid:o, m:o)
 
 INSTRUCTION FOR AGENT: Review the TOON headers above. Select the exact
 'toolName' strings you need, and pass them as an array to scaffold_mcp_server.
@@ -329,12 +332,15 @@ The agent selects the relevant tool names and calls `scaffold_mcp_server`:
 
 ```json
 {
-  "projectName": "rc-cleanup-bot",
+  "projectName": "rc-vendor-provisioning-mcp",
   "selectedToolNames": [
-    "post_api_v1_chat_delete",
-    "post_api_v1_channels_delete",
-    "post_api_v1_channels_kick",
-    "get_api_v1_rooms_cleanHistory"
+    "post_api_v1_users_create",
+    "post_api_v1_users_update",
+    "post_api_v1_channels_invite",
+    "post_api_v1_groups_invite",
+    "post_api_v1_im_create",
+    "post_api_v1_chat_postMessage",
+    "get_api_v1_users_info"
   ]
 }
 ```
@@ -344,13 +350,12 @@ The agent selects the relevant tool names and calls `scaffold_mcp_server`:
 The generator scaffolds the project, installs dependencies, and verifies:
 
 ```
-Project "rc-cleanup-bot" generated with 4 tools at examples/rc-cleanup-bot.
+Project "rc-vendor-provisioning-mcp" generated with 7 tools at examples/rc-vendor-provisioning-mcp.
 
 📁 Generated Test Files:
-  - tests/post_api_v1_chat_delete.test.ts
-  - tests/post_api_v1_channels_delete.test.ts
-  - tests/post_api_v1_channels_kick.test.ts
-  - tests/get_api_v1_rooms_cleanHistory.test.ts
+  - tests/post_api_v1_users_create.test.ts
+  - tests/post_api_v1_channels_invite.test.ts
+  - ... (7 files)
 
 🛡️ Self-Testing Guarantee Report:
   npm install:   ✅ Passed

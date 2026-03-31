@@ -7,7 +7,24 @@ import type { Endpoint } from "./parser.js";
 
 const execAsync = promisify(exec);
 
-export async function generateProjectFiles(projectDir: string, projectName: string, endpoints: Endpoint[]) {
+// --- Orchestration Metadata (optional, provided by Gemini or the LLM agent) ---
+export interface OrchestrationStep {
+  label: string;   // e.g., "Retrieve Context"
+  detail: string;  // e.g., "Fetches the original message content for the report."
+}
+
+export interface OrchestrationMeta {
+  name: string;           // e.g., "moderate_message"
+  description: string;    // One-liner summary
+  steps: OrchestrationStep[];
+}
+
+export async function generateProjectFiles(
+  projectDir: string,
+  projectName: string,
+  endpoints: Endpoint[],
+  orchestration?: OrchestrationMeta,
+) {
   const srcDir = path.join(projectDir, "src");
   const toolsDir = path.join(srcDir, "tools");
   const testsDir = path.join(projectDir, "tests");
@@ -18,6 +35,8 @@ export async function generateProjectFiles(projectDir: string, projectName: stri
 
   Handlebars.registerHelper("eq", (a, b) => a === b);
   Handlebars.registerHelper("hasRequired", (params) => params && params.some((p: any) => p.required));
+  // Increment helper for 1-based numbering in templates: {{inc @index}}
+  Handlebars.registerHelper("inc", (value: number) => value + 1);
 
   // 2. Load and Compile Templates
   const toolTpl = Handlebars.compile(await fs.readFile("templates/tool.hbs", "utf-8"));
@@ -49,7 +68,13 @@ export async function generateProjectFiles(projectDir: string, projectName: stri
   await fs.writeFile(path.join(projectDir, "tsconfig.json"), tsconfigTpl({}));
   await fs.writeFile(path.join(projectDir, "vitest.config.ts"), vitestConfigTpl({}));
   await fs.writeFile(path.join(testsDir, "setup.ts"), setupTpl({}));
-  await fs.writeFile(path.join(projectDir, "README.md"), readmeTpl({ projectName, toolNames, endpoints }));
+  await fs.writeFile(path.join(projectDir, "README.md"), readmeTpl({
+    projectName,
+    projectDir,
+    toolNames,
+    endpoints,
+    orchestration: orchestration || null,
+  }));
 
   // 5. Write Environment Template
   const envContent = `ROCKETCHAT_URL=http://localhost:3000\nROCKETCHAT_USER=\nROCKETCHAT_PASSWORD=\nROCKETCHAT_AUTH_TOKEN=\nROCKETCHAT_USER_ID=\n`;

@@ -7,7 +7,7 @@ import { z } from "zod";
 
 export const tool = {
   name: "test_tool",
-  description: "test.tool()", // 🚀 The TOON Context Saver
+  description: "test.tool()", //  The TOON Context Saver
   inputSchema: z.object({
     userId: z.string(),
     count: z.number().optional(),

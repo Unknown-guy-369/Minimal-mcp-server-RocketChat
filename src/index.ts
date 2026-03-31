@@ -62,13 +62,21 @@ server.registerTool(
 server.registerTool(
   "scaffold_mcp_server",
   {
-    description: "Generate a Minimal MCP server project using specific toolNames.",
+    description: "Generate a Minimal MCP server project using specific toolNames. Optionally include an orchestration workflow.",
     inputSchema: {
       projectName: z.string().optional().describe("Auto-generate a descriptive kebab-case name based on intent (e.g., 'rc-stats-bot')."),
       selectedToolNames: z.array(z.string()).describe("Array of specific toolNames from the explore_rc_api output (e.g. ['users.create', 'chat.delete'])."),
+      orchestration: z.object({
+        name: z.string().describe("Name of the high-level orchestration tool (e.g., 'moderate_message')."),
+        description: z.string().describe("One-liner summarising the orchestration workflow."),
+        steps: z.array(z.object({
+          label: z.string().describe("Step label (e.g., 'Retrieve Context')."),
+          detail: z.string().describe("What this step does."),
+        })).describe("Ordered steps the orchestration tool performs."),
+      }).optional().describe("Optional high-level workflow that composes the atomic tools into a single operation."),
     }
   },
-  async ({ projectName, selectedToolNames }) => {
+  async ({ projectName, selectedToolNames, orchestration }) => {
     // Fallback name if LLM forgets
     const finalName = (projectName && projectName.trim()) ? projectName.replace(/\s+/g, '-') : `rc-${selectedToolNames[0]?.replace('.', '-')}-bot`;
 
@@ -86,7 +94,7 @@ server.registerTool(
 
     // Generate the minimal project inside examples/
     const projectPath = path.resolve("examples", finalName);
-    const result = await generateProjectFiles(projectPath, finalName, endpointsToBuild);
+    const result = await generateProjectFiles(projectPath, finalName, endpointsToBuild, orchestration);
 
     return { content: [{ type: "text", text: `${result}\n\nTo run: cd examples/${finalName} && npm install && npm start` }] };
   }
